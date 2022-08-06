@@ -1,7 +1,7 @@
 package option
 
 type Option struct {
-	ID          string `json:"ID"`
+	ID          string `json:"id"`
 	Name        string `json:"name,omitempty"`
 	Image       string `json:"image,omitempty"`
 	Group       string `json:"group,omitempty"`

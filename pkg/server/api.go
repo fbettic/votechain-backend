@@ -32,7 +32,12 @@ func (a *api) Router() http.Handler {
 	return a.router
 }
 
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
 func (a *api) fetchOptions(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	options, _ := a.repository.FetchOptions()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(options)
