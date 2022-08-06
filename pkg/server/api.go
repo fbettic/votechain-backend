@@ -1,27 +1,39 @@
 package server
 
 import (
+	"encoding/json"
 	"net/http"
 
+	option "github.com/fbettic/votechain-backend/pkg"
 	"github.com/gorilla/mux"
 )
 
 type api struct {
 	router http.Handler
+	repository option.OptionRepository
 }
 
 type Server interface {
 	Router() http.Handler
 }
 
-func New() Server {
-	a := &api{}
+func New(repository option.OptionRepository) Server {
+	a := &api{repository: repository}
 
 	r := mux.NewRouter()
+
+	r.HandleFunc("/votechainapi/options", a.fetchOptions).Methods("GET")
+
 	a.router = r
 	return a
 }
 
 func (a *api) Router() http.Handler {
 	return a.router
+}
+
+func (a *api) fetchOptions(w http.ResponseWriter, r *http.Request) {
+	options, _ := a.repository.FetchOptions()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(options)
 }
