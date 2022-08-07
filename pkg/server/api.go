@@ -23,6 +23,7 @@ func New(repository option.OptionRepository) Server {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/votechainapi/options", a.fetchOptions).Methods("GET")
+	r.HandleFunc("/votechainapi/vote", a.registerVote).Methods("POST")
 
 	a.router = r
 	return a
@@ -41,4 +42,16 @@ func (a *api) fetchOptions(w http.ResponseWriter, r *http.Request) {
 	options, _ := a.repository.FetchOptions()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(options)
+}
+
+func (a *api) registerVote(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+	var vote option.Vote
+	json.NewDecoder(r.Body).Decode(&vote)
+	a.repository.RegisterVote(vote)
+
+	w.WriteHeader(http.StatusOK)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(vote)
 }

@@ -1,6 +1,7 @@
 package inmem
 
 import (
+	"fmt"
 	"sync"
 
 	option "github.com/fbettic/votechain-backend/pkg"
@@ -31,4 +32,8 @@ func (r *optionRepository) FetchOptions() ([]*option.Option, error) {
 	}
 
 	return options, nil
+}
+
+func (r *optionRepository) RegisterVote(vote option.Vote) {
+	fmt.Print(vote)
 }
