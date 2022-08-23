@@ -9,7 +9,7 @@ import (
 )
 
 type api struct {
-	router http.Handler
+	router     http.Handler
 	repository option.OptionRepository
 }
 
@@ -48,10 +48,10 @@ func (a *api) registerVote(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
 	var vote option.Vote
 	json.NewDecoder(r.Body).Decode(&vote)
-	a.repository.RegisterVote(vote)
+	transaction := a.repository.RegisterVote(vote)
 
 	w.WriteHeader(http.StatusOK)
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(vote)
+	json.NewEncoder(w).Encode(transaction)
 }

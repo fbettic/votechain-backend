@@ -12,6 +12,8 @@ import (
 )
 
 func main() {
+
+	// Server init
 	withData := flag.Bool("withData", false, "initialize the api with some options")
 	flag.Parse()
 
@@ -19,7 +21,7 @@ func main() {
 	if *withData {
 		println("initializing the api with some options")
 		options = sample.Options
-	}else{
+	} else {
 		println("initializing the api without any options")
 	}
 

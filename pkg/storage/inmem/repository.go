@@ -1,24 +1,44 @@
 package inmem
 
 import (
-	"fmt"
+	"crypto/ecdsa"
 	"sync"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
 	option "github.com/fbettic/votechain-backend/pkg"
+	"github.com/fbettic/votechain-backend/pkg/api"
 )
 
 type optionRepository struct {
-	mtx    sync.RWMutex
+	mtx     sync.RWMutex
 	options map[string]*option.Option
+	conn    *api.Api
 }
 
 func NewOptionRepository(options map[string]*option.Option) option.OptionRepository {
+
+	client, err := ethclient.Dial("http://181.14.224.135:8545")
+
+	if err != nil {
+		panic(err)
+	}
+
+	conn, err := api.NewApi(common.HexToAddress("38Fef9ccf460A4d296f8327eBF7A9DfbD9135709"), client)
+	if err != nil {
+		panic(err)
+	}
+
 	if options == nil {
 		options = make(map[string]*option.Option)
 	}
-	
+
 	return &optionRepository{
 		options: options,
+		conn:    conn,
 	}
 }
 
@@ -34,6 +54,24 @@ func (r *optionRepository) FetchOptions() ([]*option.Option, error) {
 	return options, nil
 }
 
-func (r *optionRepository) RegisterVote(vote option.Vote) {
-	fmt.Print(vote)
+func (r *optionRepository) RegisterVote(vote option.Vote) *types.Transaction {
+	privateKey, err := crypto.HexToECDSA("8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7")
+	if err != nil {
+		panic(err)
+	}
+
+	publicKey := privateKey.Public()
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		panic("invalid key")
+	}
+
+	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+
+	transaction, err := r.conn.CastVote(&bind.TransactOpts{From: fromAddress}, vote.Username, vote.OptionID)
+	if err != nil {
+		panic(err)
+	}
+
+	return transaction
 }

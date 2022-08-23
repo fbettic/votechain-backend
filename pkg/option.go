@@ -1,5 +1,7 @@
 package option
 
+import "github.com/ethereum/go-ethereum/core/types"
+
 type Option struct {
 	ID          string `json:"id"`
 	Name        string `json:"name,omitempty"`
@@ -15,5 +17,5 @@ type Vote struct {
 
 type OptionRepository interface {
 	FetchOptions() ([]*Option, error)
-	RegisterVote(vote Vote)
+	RegisterVote(vote Vote) *types.Transaction
 }
