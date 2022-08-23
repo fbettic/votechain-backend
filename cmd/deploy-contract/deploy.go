@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	client, err := ethclient.Dial("http://181.14.224.135:8545")
+	client, err := ethclient.Dial("http://votechain.ddns.net:8545/")
 	if err != nil {
 		panic(err)
 	}

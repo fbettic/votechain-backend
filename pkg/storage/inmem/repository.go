@@ -1,6 +1,7 @@
 package inmem
 
 import (
+	"context"
 	"crypto/ecdsa"
 	"sync"
 
@@ -17,17 +18,18 @@ type optionRepository struct {
 	mtx     sync.RWMutex
 	options map[string]*option.Option
 	conn    *api.Api
+	client  *ethclient.Client
 }
 
 func NewOptionRepository(options map[string]*option.Option) option.OptionRepository {
 
-	client, err := ethclient.Dial("http://181.14.224.135:8545")
+	client, err := ethclient.Dial("http://votechain.ddns.net:8545")
 
 	if err != nil {
 		panic(err)
 	}
 
-	conn, err := api.NewApi(common.HexToAddress("38Fef9ccf460A4d296f8327eBF7A9DfbD9135709"), client)
+	conn, err := api.NewApi(common.HexToAddress("0x00fFD3548725459255f1e78A61A07f1539Db0271"), client)
 	if err != nil {
 		panic(err)
 	}
@@ -39,6 +41,7 @@ func NewOptionRepository(options map[string]*option.Option) option.OptionReposit
 	return &optionRepository{
 		options: options,
 		conn:    conn,
+		client:  client,
 	}
 }
 
@@ -67,8 +70,14 @@ func (r *optionRepository) RegisterVote(vote option.Vote) *types.Transaction {
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+	fun := func(common common.Address, transaction *types.Transaction) (*types.Transaction, error) {
+		chainid, _ := r.client.ChainID(context.Background())
+		signer := types.NewEIP155Signer(chainid)
+		transaction.WithSignature(signer)
+		return transaction, nil
+	}
 
-	transaction, err := r.conn.CastVote(&bind.TransactOpts{From: fromAddress}, vote.Username, vote.OptionID)
+	transaction, err := r.conn.CastVote(&bind.TransactOpts{From: fromAddress, Signer: fun}, vote.Username, vote.OptionID)
 	if err != nil {
 		panic(err)
 	}
