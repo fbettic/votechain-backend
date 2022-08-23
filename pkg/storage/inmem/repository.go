@@ -3,6 +3,8 @@ package inmem
 import (
 	"context"
 	"crypto/ecdsa"
+	"log"
+	"math/big"
 	"sync"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -70,14 +72,25 @@ func (r *optionRepository) RegisterVote(vote option.Vote) *types.Transaction {
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-	fun := func(common common.Address, transaction *types.Transaction) (*types.Transaction, error) {
-		chainid, _ := r.client.ChainID(context.Background())
-		signer := types.NewEIP155Signer(chainid)
-		transaction.WithSignature(signer)
-		return transaction, nil
+	nonce, err := r.client.PendingNonceAt(context.Background(), fromAddress)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	transaction, err := r.conn.CastVote(&bind.TransactOpts{From: fromAddress, Signer: fun}, vote.Username, vote.OptionID)
+	gasPrice, err := r.client.SuggestGasPrice(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	chainid, _ := r.client.ChainID(context.Background())
+
+	auth, _ := bind.NewKeyedTransactorWithChainID(privateKey, chainid)
+	auth.Nonce = big.NewInt(int64(nonce))
+	auth.Value = big.NewInt(0)     // in wei
+	auth.GasLimit = uint64(300000) // in units
+	auth.GasPrice = gasPrice
+
+	transaction, err := r.conn.CastVote(auth, vote.Username, vote.OptionID)
 	if err != nil {
 		panic(err)
 	}
