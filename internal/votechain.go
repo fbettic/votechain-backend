@@ -3,10 +3,10 @@ package votechain
 import (
 	"sync"
 
+	"github.com/MatiasCermak/votechain-contracts-api/contracts/api"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/fbettic/votechain-backend/pkg/api"
 	"github.com/fbettic/votechain-backend/pkg/dto"
 )
 
