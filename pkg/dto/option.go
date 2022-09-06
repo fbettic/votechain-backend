@@ -8,11 +8,6 @@ type Option struct {
 	Description string `json:"description,omitempty"`
 }
 
-type Vote struct {
-	OptionID string `json:"option_id"`
-	Username string `json:"username"`
-}
-
 type User struct {
 	Cuit string `json:"cuit"`
 	Password string `json:"password"`

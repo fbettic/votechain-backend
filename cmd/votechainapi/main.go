@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	sample "github.com/fbettic/votechain-backend/cmd/sample-data" // import the sample package
-	option "github.com/fbettic/votechain-backend/pkg"             // import the option package
+	sample "github.com/fbettic/votechain-backend/internal/mock-data" // import the sample package
+	option "github.com/fbettic/votechain-backend/pkg/dto"             // import the option package
 	"github.com/fbettic/votechain-backend/pkg/server"             // import the server package
 	"github.com/fbettic/votechain-backend/pkg/storage/inmem"
 )

@@ -7,7 +7,7 @@ import (
 	"os"
 	"sync"
 
-	option "github.com/fbettic/votechain-backend/pkg"
+	option "github.com/fbettic/votechain-backend/pkg/dto"
 )
 
 type optionRepository struct {

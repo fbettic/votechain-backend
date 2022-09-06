@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	option "github.com/fbettic/votechain-backend/pkg"
+	option "github.com/fbettic/votechain-backend/pkg/dto"
 	"github.com/gorilla/mux"
 )
 
