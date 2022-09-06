@@ -13,7 +13,17 @@ type Vote struct {
 	Username string `json:"username"`
 }
 
+type User struct {
+	Cuit string `json:"cuit"`
+	Password string `json:"password"`
+}
+
 type OptionRepository interface {
 	FetchOptions() ([]*Option, error)
 	RegisterVote(vote Vote)
+	Login(user User) bool
 }
+
+
+
+
