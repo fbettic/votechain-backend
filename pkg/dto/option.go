@@ -1,4 +1,4 @@
-package option
+package dto
 
 type Option struct {
 	ID          string `json:"id"`
@@ -23,7 +23,3 @@ type OptionRepository interface {
 	RegisterVote(vote Vote)
 	Login(user User) bool
 }
-
-
-
-
