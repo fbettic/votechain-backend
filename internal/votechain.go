@@ -23,20 +23,26 @@ type Broker struct {
 	client  *ethclient.Client
 }
 
-func New(cfg Config, options map[string]*dto.Option) (*Broker, error) {
+func New(cfg Config, options map[string]*dto.Option, local bool) (*Broker, error) {
 	r := &Broker{}
 
 	if err := validateConfig(cfg); err != nil {
 		return nil, err
 	}
 
-	client, err := ethclient.Dial("http://votechain.ddns.net:8545")
+	net := "http://votechain.ddns.net:8545"
+
+	if local{
+		net = "http://192.168.1.200:8545"
+	}
+
+	client, err := ethclient.Dial(net)
 
 	if err != nil {
 		panic(err)
 	}
 
-	conn, err := api.NewApi(common.HexToAddress("0x00fFD3548725459255f1e78A61A07f1539Db0271"), client)
+	conn, err := api.NewApi(common.HexToAddress("0xb5B5Cd5C13DA7Dc529fF3d42282586F27b3a9416"), client)
 	if err != nil {
 		panic(err)
 	}

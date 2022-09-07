@@ -28,7 +28,7 @@ type Broker struct {
 }
 
 // New initializes a new Storefront API.
-func New(cfg Config, option map[string]*dto.Option) (*Broker, error) {
+func New(cfg Config, option map[string]*dto.Option, local bool) (*Broker, error) {
 	r := &Broker{}
 
 	err := validateConfig(cfg)
@@ -37,7 +37,7 @@ func New(cfg Config, option map[string]*dto.Option) (*Broker, error) {
 	}
 	r.cfg = cfg
 
-	r.Votechain, err = votechain.New(cfg.Votechain, option)
+	r.Votechain, err = votechain.New(cfg.Votechain, option, local)
 	if err != nil {
 		return nil, fmt.Errorf("invalid votechain configuration: %w", err)
 	}

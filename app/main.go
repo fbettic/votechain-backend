@@ -15,6 +15,7 @@ func main() {
 
 	// Server init
 	withData := flag.Bool("withData", false, "initialize the api with some options")
+	local := flag.Bool("local",false,"Connect from within the same network")
 	flag.Parse()
 
 	var options map[string]*dto.Option
@@ -25,7 +26,7 @@ func main() {
 		println("initializing the api without any options")
 	}
 
-	srv, err := webserver.New(hydratedConfig, options)
+	srv, err := webserver.New(hydratedConfig, options, *local)
 	if err != nil {
 		panic(err)
 	}
