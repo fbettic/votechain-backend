@@ -7,3 +7,12 @@ type Option struct {
 	Group       string `json:"group,omitempty"`
 	Description string `json:"description,omitempty"`
 }
+
+type OptionWithCount struct {
+	ID          string `json:"id"`
+	Name        string `json:"name,omitempty"`
+	Image       string `json:"image,omitempty"`
+	Group       string `json:"group,omitempty"`
+	Description string `json:"description,omitempty"`
+	Votes		string `json:"votes"`
+}

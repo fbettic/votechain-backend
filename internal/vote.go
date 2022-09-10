@@ -66,12 +66,14 @@ func (r *Broker) RegisterVote(vote dto.Vote) *types.Transaction {
 		panic(err)
 	}
 
-	voted, err := r.conn.GetVoteCount(&bind.CallOpts{Pending: false, From: fromAddress}, vote.OptionID)
+	fmt.Println("Voto registrado correctamente")
+	
+	/*voted, err := r.conn.GetVoteCount(&bind.CallOpts{Pending: false, From: fromAddress}, vote.OptionID)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(voted)
+	fmt.Println(voted)*/
 
 	return transaction
 }
