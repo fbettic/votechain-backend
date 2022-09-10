@@ -43,7 +43,7 @@ func New(cfg Config, options map[string]*dto.Option, local bool) (*Broker, error
 		panic(err)
 	}
 
-	conn, err := api.NewApi(common.HexToAddress("0xb5B5Cd5C13DA7Dc529fF3d42282586F27b3a9416"), client)
+	conn, err := api.NewApi(common.HexToAddress("0x00fFD3548725459255f1e78A61A07f1539Db0271"), client)
 	if err != nil {
 		panic(err)
 	}
