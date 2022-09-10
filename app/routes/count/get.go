@@ -2,7 +2,6 @@ package count
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/fbettic/votechain-backend/app/middleware"
@@ -24,7 +23,12 @@ func Get(srv webserver.Server) http.HandlerFunc {
 			}
 		}
 		if option == nil{
-			fmt.Println("Option not found")
+			error := &dto.ErrorMessage{
+						Status: 404,
+						Message: "Option not found",
+					}
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(error)
 			return
 		}
 		optionCounted, _ := srv.FetchOptionCount(option)

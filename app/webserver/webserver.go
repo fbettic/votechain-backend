@@ -8,7 +8,7 @@ import (
 	"os"
 	"strconv"
 
-	votechain "github.com/fbettic/votechain-backend/internal"
+	votechain "github.com/fbettic/votechain-backend/internal/votechain"
 	"github.com/fbettic/votechain-backend/pkg/dto"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
