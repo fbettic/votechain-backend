@@ -13,6 +13,7 @@ import (
 type Votechain interface {
 	FetchOptions() ([]*dto.Option, error)
 	RegisterVote(vote dto.Vote) *types.Transaction
+	FetchOptionCount(*dto.Option) (*dto.OptionWithCount, error)
 }
 
 type Broker struct {
@@ -23,14 +24,20 @@ type Broker struct {
 	client  *ethclient.Client
 }
 
-func New(cfg Config, options map[string]*dto.Option) (*Broker, error) {
+func New(cfg Config, options map[string]*dto.Option, local bool) (*Broker, error) {
 	r := &Broker{}
 
 	if err := validateConfig(cfg); err != nil {
 		return nil, err
 	}
 
-	client, err := ethclient.Dial("http://votechain.ddns.net:8545")
+	net := "http://votechain.ddns.net:8545"
+
+	if local{
+		net = "http://192.168.1.200:8545"
+	}
+
+	client, err := ethclient.Dial(net)
 
 	if err != nil {
 		panic(err)

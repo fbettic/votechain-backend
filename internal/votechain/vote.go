@@ -44,17 +44,36 @@ func (r *Broker) RegisterVote(vote dto.Vote) *types.Transaction {
 	auth.GasLimit = uint64(300000) // in units
 	auth.GasPrice = gasPrice
 
+	isvalid, err := r.conn.IsValidOption(&bind.CallOpts{Pending: false, From: fromAddress},vote.OptionID)
+	if err != nil {
+		panic(err)
+	}
+	if !isvalid{
+		fmt.Println("Invalid option selected")
+		return nil
+	}
+	hasVoted, err := r.conn.HasVoted(&bind.CallOpts{Pending: false, From: fromAddress}, vote.Username)
+	if err != nil {
+		panic(err)
+	}
+	if hasVoted{
+		fmt.Println("User has alredy voted")
+		return nil
+	}
+
 	transaction, err := r.conn.CastVote(auth, vote.Username, vote.OptionID)
 	if err != nil {
 		panic(err)
 	}
 
-	voted, err := r.conn.GetVoteCount(&bind.CallOpts{Pending: false, From: fromAddress}, "1")
+	fmt.Println("Voto registrado correctamente")
+	
+	/*voted, err := r.conn.GetVoteCount(&bind.CallOpts{Pending: false, From: fromAddress}, vote.OptionID)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Print(voted)
+	fmt.Println(voted)*/
 
 	return transaction
 }

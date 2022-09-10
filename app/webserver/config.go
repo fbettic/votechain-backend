@@ -1,6 +1,6 @@
 package webserver
 
-import votechain "github.com/fbettic/votechain-backend/internal"
+import votechain "github.com/fbettic/votechain-backend/internal/votechain"
 
 // Config for the storefront API.
 type Config struct {
