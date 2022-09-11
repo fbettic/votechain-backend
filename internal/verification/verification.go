@@ -1,9 +1,9 @@
-package verify
+package verification
 
 import (
 	"crypto/rand"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io/ioutil"
 	"os"
 )
@@ -14,16 +14,24 @@ func CreateVerificationCode(hash string) (string, error) {
 	jsonFile, err := os.OpenFile("internal/mock-data/verification-codes.json", os.O_RDWR, os.ModeAppend)
 
 	if err != nil {
-		fmt.Println(err)
+		return "Fallo al contactar base de datos", err
 	}
 
 	defer jsonFile.Close()
 
-	byteValue, _ := ioutil.ReadAll(jsonFile)
+	byteValue, err := ioutil.ReadAll(jsonFile)
+
+	if err != nil {
+		return "Fallo al leer base de datos", err
+	}
 
 	var verificationMap = make(map[string]string)
 
-	json.Unmarshal(byteValue, &verificationMap)
+	err = json.Unmarshal(byteValue, &verificationMap)
+
+	if err != nil {
+		return "Fallo en el formateo de datos", err
+	}
 
 	var isValidCode = false
 	var code string
@@ -32,13 +40,22 @@ func CreateVerificationCode(hash string) (string, error) {
 		code, err = createCode()
 
 		if err != nil {
-			fmt.Println(err)
+			return "Fallo al crear código alfanumérico", err
 		}
 
 		if _, isPresent := verificationMap[code]; !isPresent {
 			verificationMap[code] = hash
 			isValidCode = true
-			json.Marshal(&verificationMap)
+
+			data, err := json.Marshal(&verificationMap)
+			if err != nil {
+				return "Fallo al formatear datos de base de datos", err
+			}
+
+			_, err = jsonFile.WriteAt(data, 0)
+			if err != nil {
+				return "Fallo al escribir en base de datos", err
+			}
 
 		}
 
@@ -65,15 +82,29 @@ func GetHashCode(verificationCode string) (string, error) {
 	jsonFile, err := os.OpenFile("internal/mock-data/verification-codes.json", os.O_RDWR, os.ModeAppend)
 
 	if err != nil {
-		fmt.Println(err)
+		return "Fallo al contactar base de datos", err
 	}
 
 	defer jsonFile.Close()
 
-	byteValue, _ := ioutil.ReadAll(jsonFile)
+	byteValue, err := ioutil.ReadAll(jsonFile)
+
+	if err != nil {
+		return "Fallo al leer base de datos", err
+	}
 
 	var verificationMap = make(map[string]string)
 
-	json.Unmarshal(byteValue, &verificationMap)
+	err = json.Unmarshal(byteValue, &verificationMap)
+
+	if err != nil {
+		return "Fallo en el formateo de datos", err
+	}
+
+	hashValue, isPresent := verificationMap[verificationCode]
+	if !isPresent {
+		return "Código de verificación no encontrado en base de datos", errors.New("Código de verificación no encontrado en base de datos")
+	}
+	return hashValue, nil
 
 }
