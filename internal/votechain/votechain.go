@@ -14,6 +14,7 @@ type Votechain interface {
 	FetchOptions() ([]*dto.Option, error)
 	RegisterVote(vote dto.Vote) (*types.Transaction, *dto.ErrorMessage)
 	FetchOptionCount(*dto.Option) (*dto.OptionWithCount, *dto.ErrorMessage)
+	GetVote(string) (*dto.Option, *dto.ErrorMessage)
 }
 
 type Broker struct {
@@ -59,3 +60,4 @@ func New(cfg Config, options map[string]*dto.Option, local bool) (*Broker, error
 
 	return r, nil
 }
+

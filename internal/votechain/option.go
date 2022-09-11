@@ -2,7 +2,6 @@ package votechain
 
 import (
 	"crypto/ecdsa"
-	"fmt"
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -31,11 +30,11 @@ func (r *Broker) FetchOptions() ([]*dto.Option, error) {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	options := make([]*dto.Option, 0, len(r.options))
 	for _, option := range r.options {
-		for i := range chainOpt {			
-			if chainOpt[i] == option.ID{
+		for i := range chainOpt {
+			if chainOpt[i] == option.ID {
 				options = append(options, option)
 			}
 		}
@@ -44,7 +43,7 @@ func (r *Broker) FetchOptions() ([]*dto.Option, error) {
 	return options, nil
 }
 
-func (r *Broker) FetchOptionCount(option *dto.Option) (*dto.OptionWithCount, *dto.ErrorMessage){
+func (r *Broker) FetchOptionCount(option *dto.Option) (*dto.OptionWithCount, *dto.ErrorMessage) {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 
@@ -66,11 +65,10 @@ func (r *Broker) FetchOptionCount(option *dto.Option) (*dto.OptionWithCount, *dt
 		panic(err)
 	}
 	if !isValid {
-		fmt.Println("Option invalid")
 		erro := &dto.ErrorMessage{
-					Status: 400,
-					Message: "Invalid option selected",
-				}
+			Status:  400,
+			Message: "Invalid option selected",
+		}
 		return nil, erro
 	}
 	count, err := r.conn.GetVoteCount(&bind.CallOpts{Pending: false, From: fromAddress}, option.ID)
