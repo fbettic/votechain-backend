@@ -1,8 +1,18 @@
 package verification
 
-import "github.com/ethereum/go-ethereum/crypto"
+import (
+	"encoding/json"
 
-func GetHash() string {
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/fbettic/votechain-backend/pkg/dto"
+)
 
-	return string(crypto.Keccak256())
+func CreateHash(user dto.User) (string, error) {
+	data, err := json.Marshal(user)
+
+	if err != nil {
+		return "No se pudieron formatear los datos", err
+	}
+
+	return string(crypto.Keccak256(data)), nil
 }
