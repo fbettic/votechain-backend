@@ -23,15 +23,20 @@ func Get(srv webserver.Server) http.HandlerFunc {
 			}
 		}
 		if option == nil{
-			error := &dto.ErrorMessage{
+			err := &dto.ErrorMessage{
 						Status: 404,
 						Message: "Option not found",
 					}
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(error)
+			json.NewEncoder(w).Encode(err)
 			return
 		}
-		optionCounted, _ := srv.FetchOptionCount(option)
+		optionCounted, err := srv.FetchOptionCount(option)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(err)
+			return
+		}
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(optionCounted)

@@ -14,7 +14,12 @@ func Post(srv webserver.Server) http.HandlerFunc {
 		middleware.EnableCors(&w)
 		var vote dto.Vote
 		json.NewDecoder(r.Body).Decode(&vote)
-		transaction := srv.RegisterVote(vote)
+		transaction, err := srv.RegisterVote(vote)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(err)
+			return
+		}
 
 		w.WriteHeader(http.StatusOK)
 

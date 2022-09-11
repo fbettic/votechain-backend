@@ -13,7 +13,7 @@ import (
 	"github.com/fbettic/votechain-backend/pkg/dto"
 )
 
-func (r *Broker) RegisterVote(vote dto.Vote) *types.Transaction {
+func (r *Broker) RegisterVote(vote dto.Vote) (*types.Transaction, *dto.ErrorMessage) {
 	privateKey, err := crypto.HexToECDSA("8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7")
 	if err != nil {
 		panic(err)
@@ -49,16 +49,22 @@ func (r *Broker) RegisterVote(vote dto.Vote) *types.Transaction {
 		panic(err)
 	}
 	if !isvalid{
-		fmt.Println("Invalid option selected")
-		return nil
+		erro := &dto.ErrorMessage{
+					Status: 400,
+					Message: "Invalid option selected",
+				}
+		return nil, erro
 	}
 	hasVoted, err := r.conn.HasVoted(&bind.CallOpts{Pending: false, From: fromAddress}, vote.Username)
 	if err != nil {
 		panic(err)
 	}
 	if hasVoted{
-		fmt.Println("User has alredy voted")
-		return nil
+		erro := &dto.ErrorMessage{
+					Status: 401,
+					Message: "User has alredy voted",
+				}
+		return nil, erro
 	}
 
 	transaction, err := r.conn.CastVote(auth, vote.Username, vote.OptionID)
@@ -75,5 +81,5 @@ func (r *Broker) RegisterVote(vote dto.Vote) *types.Transaction {
 
 	fmt.Println(voted)*/
 
-	return transaction
+	return transaction, nil
 }
