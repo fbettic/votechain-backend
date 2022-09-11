@@ -12,6 +12,7 @@ import (
 
 type Votechain interface {
 	FetchOptions() ([]*dto.Option, error)
+	Login(userLogin dto.Login) (*dto.User, error)
 	RegisterVote(vote dto.Vote) (*types.Transaction, *dto.ErrorMessage)
 	FetchOptionCount(*dto.Option) (*dto.OptionWithCount, *dto.ErrorMessage)
 	GetVote(string) (*dto.Option, *dto.ErrorMessage)
@@ -34,7 +35,7 @@ func New(cfg Config, options map[string]*dto.Option, local bool) (*Broker, error
 
 	net := "http://votechain.ddns.net:8545"
 
-	if local{
+	if local {
 		net = "http://192.168.1.200:8545"
 	}
 

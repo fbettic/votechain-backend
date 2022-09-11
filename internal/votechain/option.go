@@ -2,6 +2,7 @@ package votechain
 
 import (
 	"crypto/ecdsa"
+	"fmt"
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"

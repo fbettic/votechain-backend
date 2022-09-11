@@ -27,3 +27,19 @@ var Options = map[string]*dto.Option{
 		Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus auctor in velit eget ultricies. Curabitur facilisis nibh eget tortor volutpat vestibulum. Ut pretium mattis sollicitudin. Sed sit amet erat ut odio dignissim aliquet. Suspendisse tempor magna et ante feugiat, eu cursus nunc ullamcorper. Duis sed ante a metus blandit varius eu et sapien. Praesent at mauris lacus.",
 	},
 }
+
+
+var Users = map[string]*dto.User{
+	"1":{
+		Name: "Matias Gutierrez",
+		Cuit: 20586568548,
+		Password: "123456",
+		AccessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTWF0aWFzIEd1dGllcnJleiIsImN1aXQiOjIwNTg2NTY4NTQ4fQ.Au1ind4DRn2izrgHQSNQKmEI3GCMTb7GwBezsckv3nA",
+	},
+	"2":{
+		Name: "Jorge Gonzalez",
+		Cuit: 18668524894,
+		Password: "123456",
+		AccessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9yZ2UgR29uemFsZXoiLCJjdWl0IjoxODY2ODUyNDg5NH0.k4ZSsaJ7WeKZwNyTte0ukGGs59ALURVqGVPQmeKBbys",
+	},
+}
