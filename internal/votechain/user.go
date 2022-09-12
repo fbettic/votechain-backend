@@ -14,9 +14,8 @@ func (r *Broker) Login(userLogin dto.Login) (*dto.User, error) {
 	users := sampledata.Users
 	fmt.Println(userLogin)
 	for _, user := range users {
-		fmt.Println(user)
 		if user.Cuit == userLogin.Cuit && user.Password == userLogin.Password {
-			fmt.Println(user)
+			fmt.Println("login success")
 			return user, nil
 		}
 	}

@@ -16,8 +16,11 @@ func (r *Broker) FetchOptions() ([]*dto.Option, error) {
 
 	options := make([]*dto.Option, 0, len(r.options))
 	for _, option := range r.options {
+		fmt.Println(option)
 		options = append(options, option)
 	}
+
+	
 
 	return options, nil
 }

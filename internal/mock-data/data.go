@@ -35,11 +35,13 @@ var Users = map[string]*dto.User{
 		Cuit: 20586568548,
 		Password: "123456",
 		AccessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTWF0aWFzIEd1dGllcnJleiIsImN1aXQiOjIwNTg2NTY4NTQ4fQ.Au1ind4DRn2izrgHQSNQKmEI3GCMTb7GwBezsckv3nA",
+		VoteCertificate: "Certificado - Matias Gutierrez",
 	},
 	"2":{
 		Name: "Jorge Gonzalez",
 		Cuit: 18668524894,
 		Password: "123456",
 		AccessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9yZ2UgR29uemFsZXoiLCJjdWl0IjoxODY2ODUyNDg5NH0.k4ZSsaJ7WeKZwNyTte0ukGGs59ALURVqGVPQmeKBbys",
+		VoteCertificate: "Certificado - Jorge Gonzalez",
 	},
 }
