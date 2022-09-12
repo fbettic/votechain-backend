@@ -34,12 +34,16 @@ func (r *Broker) FetchOptions() ([]*dto.Option, error) {
 
 	options := make([]*dto.Option, 0, len(r.options))
 	for _, option := range r.options {
+
 		for i := range chainOpt {
 			if chainOpt[i] == option.ID {
 				options = append(options, option)
 			}
 		}
+
 	}
+
+	
 
 	return options, nil
 }

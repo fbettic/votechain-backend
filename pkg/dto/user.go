@@ -10,4 +10,5 @@ type User struct{
 	Cuit 				int `json:"cuit"`
 	Password 		string `json:"password,omitempty"`
 	AccessToken string `json:"access_token"`
+	VoteCertificate string `json:"vote_certificate,omitempty"`
 }

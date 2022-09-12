@@ -12,6 +12,7 @@ func (r *Broker) Login(userLogin dto.Login) (*dto.User, error) {
 	users := sampledata.Users
 	for _, user := range users {
 		if user.Cuit == userLogin.Cuit && user.Password == userLogin.Password {
+
 			return user, nil
 		}
 	}
