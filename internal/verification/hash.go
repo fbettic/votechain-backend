@@ -11,9 +11,10 @@ import (
 func CreateHash(user dto.User) (string, error) {
 	data, err := json.Marshal(user)
 
+	
 	if err != nil {
 		return "", errors.New("500 - No se pudieron formatear los datos: "+err.Error())
 	}
 
-	return string(crypto.Keccak256(data)), nil
+	return string(crypto.Keccak256Hash(data).String()), nil
 }
