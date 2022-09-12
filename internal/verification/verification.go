@@ -37,12 +37,11 @@ func CreateVerificationCode(hash string) (string, error) {
 
 	var isValidCode = false
 	var code string
-
 	for !isValidCode {
 		code, err = createCode()
 
 		if err != nil {
-			return "", errors.New("500 - Fallo al crear código alfanumérico: "+err.Error())
+			return "", err
 		}
 
 		if _, isPresent := verificationMap[code]; !isPresent {

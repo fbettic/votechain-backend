@@ -9,14 +9,13 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/fbettic/votechain-backend/internal/verification"
 	"github.com/fbettic/votechain-backend/pkg/dto"
 	sampledata "github.com/fbettic/votechain-backend/internal/mock-data"
 )
 
-func (r *Broker) RegisterVote(vote dto.Vote) (*types.Transaction, error) {
+func (r *Broker) RegisterVote(vote dto.Vote) (string, error) {
 	var user *dto.User
 	user = nil
 	for _,userData := range sampledata.Users{
@@ -26,12 +25,12 @@ func (r *Broker) RegisterVote(vote dto.Vote) (*types.Transaction, error) {
 		}
 	}
 	if user == nil{
-		return nil, errors.New("401 - Invalid login token")
+		return "", errors.New("401 - Invalid login token")
 	}
 
 	hash, err := verification.CreateHash(*user)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	privateKey, err := crypto.HexToECDSA("8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7")
@@ -69,24 +68,29 @@ func (r *Broker) RegisterVote(vote dto.Vote) (*types.Transaction, error) {
 		panic(err)
 	}
 	if !isvalid{
-		return nil, errors.New("400 - Invalid option selected")
+		return "", errors.New("400 - Invalid option selected")
 	}
 	hasVoted, err := r.conn.HasVoted(&bind.CallOpts{Pending: false, From: fromAddress}, hash)
 	if err != nil {
 		panic(err)
 	}
 	if hasVoted{
-		return nil, errors.New("401 - User has alredy voted")
+		return "", errors.New("401 - User has alredy voted")
 	}
 
-	transaction, err := r.conn.CastVote(auth, hash, vote.OptionID)
+	_, err = r.conn.CastVote(auth, hash, vote.OptionID)
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Voto registrado correctamente")
 
-	return transaction, nil
+	validationCode, err := verification.CreateVerificationCode(hash)
+	if err != nil {
+		return "", err
+	}
+
+	return validationCode, nil
 }
 
 func (r *Broker) GetVote(code string) (*dto.Option, error){
