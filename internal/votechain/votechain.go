@@ -12,9 +12,10 @@ import (
 
 type Votechain interface {
 	FetchOptions() ([]*dto.Option, error)
-	RegisterVote(vote dto.Vote) *types.Transaction
-	FetchOptionCount(*dto.Option) (*dto.OptionWithCount, error)
 	Login(userLogin dto.Login) (*dto.User, error)
+	RegisterVote(vote dto.Vote) (*types.Transaction, error)
+	FetchOptionCount(*dto.Option) (*dto.OptionWithCount, error)
+	GetVote(string) (*dto.Option, error)
 }
 
 type Broker struct {
@@ -34,7 +35,7 @@ func New(cfg Config, options map[string]*dto.Option, local bool) (*Broker, error
 
 	net := "http://votechain.ddns.net:8545"
 
-	if local{
+	if local {
 		net = "http://192.168.1.200:8545"
 	}
 
@@ -60,3 +61,4 @@ func New(cfg Config, options map[string]*dto.Option, local bool) (*Broker, error
 
 	return r, nil
 }
+

@@ -3,6 +3,7 @@ package votechain
 import (
 	"context"
 	"crypto/ecdsa"
+	"errors"
 	"fmt"
 	"log"
 	"math/big"
@@ -10,10 +11,29 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/fbettic/votechain-backend/internal/verification"
 	"github.com/fbettic/votechain-backend/pkg/dto"
+	sampledata "github.com/fbettic/votechain-backend/internal/mock-data"
 )
 
-func (r *Broker) RegisterVote(vote dto.Vote) *types.Transaction {
+func (r *Broker) RegisterVote(vote dto.Vote) (*types.Transaction, error) {
+	var user *dto.User
+	user = nil
+	for _,userData := range sampledata.Users{
+		if userData.AccessToken == vote.AccessToken{
+			user = userData
+			break
+		}
+	}
+	if user == nil{
+		return nil, errors.New("401 - Invalid login token")
+	}
+
+	hash, err := verification.CreateHash(*user)
+	if err != nil {
+		return nil, err
+	}
+
 	privateKey, err := crypto.HexToECDSA("8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7")
 	if err != nil {
 		panic(err)
@@ -22,7 +42,7 @@ func (r *Broker) RegisterVote(vote dto.Vote) *types.Transaction {
 	publicKey := privateKey.Public()
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
 	if !ok {
-		panic("invalid key")
+		panic("Invalid key")
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
@@ -49,31 +69,65 @@ func (r *Broker) RegisterVote(vote dto.Vote) *types.Transaction {
 		panic(err)
 	}
 	if !isvalid{
-		fmt.Println("Invalid option selected")
-		return nil
+		return nil, errors.New("400 - Invalid option selected")
 	}
-	hasVoted, err := r.conn.HasVoted(&bind.CallOpts{Pending: false, From: fromAddress}, vote.Username)
+	hasVoted, err := r.conn.HasVoted(&bind.CallOpts{Pending: false, From: fromAddress}, hash)
 	if err != nil {
 		panic(err)
 	}
 	if hasVoted{
-		fmt.Println("User has alredy voted")
-		return nil
+		return nil, errors.New("401 - User has alredy voted")
 	}
 
-	transaction, err := r.conn.CastVote(auth, vote.Username, vote.OptionID)
+	transaction, err := r.conn.CastVote(auth, hash, vote.OptionID)
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Voto registrado correctamente")
-	
-	/*voted, err := r.conn.GetVoteCount(&bind.CallOpts{Pending: false, From: fromAddress}, vote.OptionID)
+
+	return transaction, nil
+}
+
+func (r *Broker) GetVote(code string) (*dto.Option, error){
+
+	hash, err := verification.GetHashCode(code)
+	if err != nil {
+		return nil, err
+	}
+
+	privateKey, err := crypto.HexToECDSA("8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7")
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(voted)*/
+	publicKey := privateKey.Public()
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		panic("invalid key")
+	}
 
-	return transaction
+	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+	
+	hasvoted, err := r.conn.HasVoted(&bind.CallOpts{Pending: false, From: fromAddress}, hash)
+	if err != nil{
+		panic(err)
+	}
+	if !hasvoted {
+		return nil, errors.New("400 - User has not voted yet")
+	}
+
+	optionVoted, err := r.conn.GetVote(&bind.CallOpts{Pending: false, From: fromAddress}, hash)
+	if err != nil {
+		panic(err)
+	}
+
+	option := new(dto.Option)
+	for _, opt := range r.options{
+		if opt.ID == optionVoted{
+			option = opt
+		}
+	}
+
+	return option, nil
 }
