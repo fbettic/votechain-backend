@@ -5,16 +5,16 @@ import (
 
 	"github.com/MatiasCermak/votechain-contracts-api/contracts/api"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fbettic/votechain-backend/pkg/dto"
 )
 
 type Votechain interface {
 	FetchOptions() ([]*dto.Option, error)
-	RegisterVote(vote dto.Vote) *types.Transaction
-	FetchOptionCount(*dto.Option) (*dto.OptionWithCount, error)
 	Login(userLogin dto.Login) (*dto.User, error)
+	RegisterVote(vote dto.Vote) (string, error)
+	FetchOptionCount(*dto.Option) (*dto.OptionWithCount, error)
+	GetVote(string) (*dto.Option, error)
 }
 
 type Broker struct {
@@ -34,7 +34,7 @@ func New(cfg Config, options map[string]*dto.Option, local bool) (*Broker, error
 
 	net := "http://votechain.ddns.net:8545"
 
-	if local{
+	if local {
 		net = "http://192.168.1.200:8545"
 	}
 
@@ -44,7 +44,8 @@ func New(cfg Config, options map[string]*dto.Option, local bool) (*Broker, error
 		panic(err)
 	}
 
-	conn, err := api.NewApi(common.HexToAddress("0x00fFD3548725459255f1e78A61A07f1539Db0271"), client)
+	//conn, err := api.NewApi(common.HexToAddress("0x00fFD3548725459255f1e78A61A07f1539Db0271"), client)
+	conn, err := api.NewApi(common.HexToAddress("0x899CE22c2142f60ecA9574c3781A076136D46373"), client)
 	if err != nil {
 		panic(err)
 	}
@@ -60,3 +61,4 @@ func New(cfg Config, options map[string]*dto.Option, local bool) (*Broker, error
 
 	return r, nil
 }
+

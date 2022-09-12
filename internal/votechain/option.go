@@ -1,31 +1,16 @@
 package votechain
 
 import (
-	"fmt"
-	"strconv"
 	"crypto/ecdsa"
+	"errors"
+	"strconv"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/fbettic/votechain-backend/pkg/dto"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/fbettic/votechain-backend/pkg/dto"
 )
 
 func (r *Broker) FetchOptions() ([]*dto.Option, error) {
-	r.mtx.Lock()
-	defer r.mtx.Unlock()
-
-	options := make([]*dto.Option, 0, len(r.options))
-	for _, option := range r.options {
-		fmt.Println(option)
-		options = append(options, option)
-	}
-
-	
-
-	return options, nil
-}
-
-func (r *Broker) FetchOptionCount(option *dto.Option) (*dto.OptionWithCount, error){
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 
@@ -37,7 +22,45 @@ func (r *Broker) FetchOptionCount(option *dto.Option) (*dto.OptionWithCount, err
 	publicKey := privateKey.Public()
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
 	if !ok {
-		panic("invalid key")
+		panic("Invalid key")
+	}
+
+	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+
+	chainOpt, err := r.conn.GetOptions(&bind.CallOpts{Pending: false, From: fromAddress})
+	if err != nil {
+		panic(err)
+	}
+
+	options := make([]*dto.Option, 0, len(r.options))
+	for _, option := range r.options {
+
+		for i := range chainOpt {
+			if chainOpt[i] == option.ID {
+				options = append(options, option)
+			}
+		}
+
+	}
+
+	
+
+	return options, nil
+}
+
+func (r *Broker) FetchOptionCount(option *dto.Option) (*dto.OptionWithCount, error) {
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
+
+	privateKey, err := crypto.HexToECDSA("8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7")
+	if err != nil {
+		panic(err)
+	}
+
+	publicKey := privateKey.Public()
+	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
+	if !ok {
+		panic("Invalid key")
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
@@ -47,8 +70,7 @@ func (r *Broker) FetchOptionCount(option *dto.Option) (*dto.OptionWithCount, err
 		panic(err)
 	}
 	if !isValid {
-		fmt.Println("Option invalid")
-		return nil, fmt.Errorf("Option invalid")
+		return nil, errors.New("400 - Invalid option selected")
 	}
 	count, err := r.conn.GetVoteCount(&bind.CallOpts{Pending: false, From: fromAddress}, option.ID)
 	if err != nil {

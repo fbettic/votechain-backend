@@ -16,4 +16,5 @@ func BuildPipeline(srv webserver.Server, r *mux.Router) {
 	r.HandleFunc("/votechainapi/vote", votes.Post(srv)).Methods("POST")
 	r.HandleFunc("/votechainapi/count/{id}",count.Get(srv)).Methods("GET")
 	r.HandleFunc("/votechainapi/login",login.Post(srv)).Methods("POST")
+	r.HandleFunc("/votechainapi/getVote/{code}",votes.Get(srv)).Methods("GET")
 }
