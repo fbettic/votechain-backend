@@ -6,6 +6,8 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+
+	sampledata "github.com/fbettic/votechain-backend/internal/mock-data"
 )
 
 const verificationChars = "1234567890ABCDEFGHIJKLMNOPQRSTUVXYZ"
@@ -14,7 +16,7 @@ func CreateVerificationCode(hash string) (string, error) {
 	jsonFile, err := os.OpenFile("internal/mock-data/verification-codes.json", os.O_RDWR, os.ModeAppend)
 
 	if err != nil {
-		return "Fallo al contactar base de datos", err
+		return "", errors.New("500 - Fallo al contactar base de datos: "+err.Error())
 	}
 
 	defer jsonFile.Close()
@@ -22,7 +24,7 @@ func CreateVerificationCode(hash string) (string, error) {
 	byteValue, err := ioutil.ReadAll(jsonFile)
 
 	if err != nil {
-		return "Fallo al leer base de datos", err
+		return "", errors.New("500 - Fallo al leer base de datos: "+err.Error())
 	}
 
 	var verificationMap = make(map[string]string)
@@ -30,7 +32,7 @@ func CreateVerificationCode(hash string) (string, error) {
 	err = json.Unmarshal(byteValue, &verificationMap)
 
 	if err != nil {
-		return "Fallo en el formateo de datos", err
+		return "", errors.New("500 - Fallo en el formateo de datos: "+err.Error())
 	}
 
 	var isValidCode = false
@@ -40,7 +42,7 @@ func CreateVerificationCode(hash string) (string, error) {
 		code, err = createCode()
 
 		if err != nil {
-			return "Fallo al crear código alfanumérico", err
+			return "", errors.New("500 - Fallo al crear código alfanumérico: "+err.Error())
 		}
 
 		if _, isPresent := verificationMap[code]; !isPresent {
@@ -49,12 +51,12 @@ func CreateVerificationCode(hash string) (string, error) {
 
 			data, err := json.Marshal(&verificationMap)
 			if err != nil {
-				return "Fallo al formatear datos de base de datos", err
+				return "", errors.New("500 - Fallo al formatear datos de base de datos: "+err.Error())
 			}
 
 			_, err = jsonFile.WriteAt(data, 0)
 			if err != nil {
-				return "Fallo al escribir en base de datos", err
+				return "", errors.New("500 - Fallo al escribir en base de datos: "+err.Error())
 			}
 
 		}
@@ -67,7 +69,7 @@ func createCode() (string, error) {
 	buffer := make([]byte, 6)
 	_, err := rand.Read(buffer)
 	if err != nil {
-		return "", err
+		return "", errors.New("500 - "+err.Error())
 	}
 
 	verificationCharsLength := len(verificationChars)
@@ -82,7 +84,7 @@ func GetHashCode(verificationCode string) (string, error) {
 	jsonFile, err := os.OpenFile("internal/mock-data/verification-codes.json", os.O_RDWR, os.ModeAppend)
 
 	if err != nil {
-		return "Fallo al contactar base de datos", err
+		return "", errors.New("500 - Fallo al contactar base de datos: "+err.Error())
 	}
 
 	defer jsonFile.Close()
@@ -90,7 +92,7 @@ func GetHashCode(verificationCode string) (string, error) {
 	byteValue, err := ioutil.ReadAll(jsonFile)
 
 	if err != nil {
-		return "Fallo al leer base de datos", err
+		return "", errors.New("500 - Fallo al leer base de datos: "+err.Error())
 	}
 
 	var verificationMap = make(map[string]string)
@@ -98,13 +100,24 @@ func GetHashCode(verificationCode string) (string, error) {
 	err = json.Unmarshal(byteValue, &verificationMap)
 
 	if err != nil {
-		return "Fallo en el formateo de datos", err
+		return "", errors.New("500 - Fallo en el formateo de datos: "+err.Error())
 	}
 
 	hashValue, isPresent := verificationMap[verificationCode]
 	if !isPresent {
-		return "Código de verificación no encontrado en base de datos", errors.New("Código de verificación no encontrado en base de datos")
+		return "", errors.New("404 - Código de verificación no encontrado en base de datos")
 	}
 	return hashValue, nil
 
+}
+
+func ValidToken(token string) bool{
+	validToken := false
+	for _,user := range sampledata.Users{
+		if user.AccessToken == token{
+			validToken = true
+			break
+		}
+	}
+	return validToken
 }

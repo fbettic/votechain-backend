@@ -13,9 +13,9 @@ import (
 type Votechain interface {
 	FetchOptions() ([]*dto.Option, error)
 	Login(userLogin dto.Login) (*dto.User, error)
-	RegisterVote(vote dto.Vote) (*types.Transaction, *dto.ErrorMessage)
-	FetchOptionCount(*dto.Option) (*dto.OptionWithCount, *dto.ErrorMessage)
-	GetVote(string) (*dto.Option, *dto.ErrorMessage)
+	RegisterVote(vote dto.Vote) (*types.Transaction, error)
+	FetchOptionCount(*dto.Option) (*dto.OptionWithCount, error)
+	GetVote(string) (*dto.Option, error)
 }
 
 type Broker struct {

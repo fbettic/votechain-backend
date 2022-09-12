@@ -3,6 +3,7 @@ package votechain
 import (
 	"context"
 	"crypto/ecdsa"
+	"errors"
 	"fmt"
 	"log"
 	"math/big"
@@ -10,20 +11,28 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/fbettic/votechain-backend/internal/verification"
 	"github.com/fbettic/votechain-backend/pkg/dto"
+	sampledata "github.com/fbettic/votechain-backend/internal/mock-data"
 )
 
-func (r *Broker) RegisterVote(vote dto.Vote) (*types.Transaction, *dto.ErrorMessage) {
-	/*hash, err := GetHashCode(code)
-	if err != nil {
-		msgerr := &dto.ErrorMessage{
-					Status: 404,
-					Message: "Code not found",
-				}
-		return nil, msgerr
+func (r *Broker) RegisterVote(vote dto.Vote) (*types.Transaction, error) {
+	var user *dto.User
+	user = nil
+	for _,userData := range sampledata.Users{
+		if userData.AccessToken == vote.AccessToken{
+			user = userData
+			break
+		}
 	}
-	*/
-	hash := "576as5d"
+	if user == nil{
+		return nil, errors.New("401 - Invalid login token")
+	}
+
+	hash, err := verification.CreateHash(*user)
+	if err != nil {
+		return nil, err
+	}
 
 	privateKey, err := crypto.HexToECDSA("8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7")
 	if err != nil {
@@ -33,7 +42,7 @@ func (r *Broker) RegisterVote(vote dto.Vote) (*types.Transaction, *dto.ErrorMess
 	publicKey := privateKey.Public()
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
 	if !ok {
-		panic("invalid key")
+		panic("Invalid key")
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
@@ -60,22 +69,14 @@ func (r *Broker) RegisterVote(vote dto.Vote) (*types.Transaction, *dto.ErrorMess
 		panic(err)
 	}
 	if !isvalid{
-		erro := &dto.ErrorMessage{
-					Status: 400,
-					Message: "Invalid option selected",
-				}
-		return nil, erro
+		return nil, errors.New("400 - Invalid option selected")
 	}
 	hasVoted, err := r.conn.HasVoted(&bind.CallOpts{Pending: false, From: fromAddress}, hash)
 	if err != nil {
 		panic(err)
 	}
 	if hasVoted{
-		erro := &dto.ErrorMessage{
-					Status: 401,
-					Message: "User has alredy voted",
-				}
-		return nil, erro
+		return nil, errors.New("401 - User has alredy voted")
 	}
 
 	transaction, err := r.conn.CastVote(auth, hash, vote.OptionID)
@@ -88,18 +89,13 @@ func (r *Broker) RegisterVote(vote dto.Vote) (*types.Transaction, *dto.ErrorMess
 	return transaction, nil
 }
 
-func (r *Broker) GetVote(code string) (*dto.Option, *dto.ErrorMessage){
+func (r *Broker) GetVote(code string) (*dto.Option, error){
 
-	/*hash, err := GetHashCode(code)
+	hash, err := verification.GetHashCode(code)
 	if err != nil {
-		msgerr := &dto.ErrorMessage{
-					Status: 404,
-					Message: "Code not found",
-				}
-		return nil, msgerr
+		return nil, err
 	}
-	*/
-	hash := "576as5d"
+
 	privateKey, err := crypto.HexToECDSA("8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7")
 	if err != nil {
 		panic(err)
@@ -118,11 +114,7 @@ func (r *Broker) GetVote(code string) (*dto.Option, *dto.ErrorMessage){
 		panic(err)
 	}
 	if !hasvoted {
-		msgerr := &dto.ErrorMessage{
-					Status: 400,
-					Message: "User has not voted yet",
-				}
-		return nil, msgerr
+		return nil, errors.New("400 - User has not voted yet")
 	}
 
 	optionVoted, err := r.conn.GetVote(&bind.CallOpts{Pending: false, From: fromAddress}, hash)

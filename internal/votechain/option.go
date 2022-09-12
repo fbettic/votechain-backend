@@ -2,7 +2,7 @@ package votechain
 
 import (
 	"crypto/ecdsa"
-	"fmt"
+	"errors"
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -22,7 +22,7 @@ func (r *Broker) FetchOptions() ([]*dto.Option, error) {
 	publicKey := privateKey.Public()
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
 	if !ok {
-		panic("invalid key")
+		panic("Invalid key")
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
@@ -44,7 +44,7 @@ func (r *Broker) FetchOptions() ([]*dto.Option, error) {
 	return options, nil
 }
 
-func (r *Broker) FetchOptionCount(option *dto.Option) (*dto.OptionWithCount, *dto.ErrorMessage) {
+func (r *Broker) FetchOptionCount(option *dto.Option) (*dto.OptionWithCount, error) {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 
@@ -56,7 +56,7 @@ func (r *Broker) FetchOptionCount(option *dto.Option) (*dto.OptionWithCount, *dt
 	publicKey := privateKey.Public()
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
 	if !ok {
-		panic("invalid key")
+		panic("Invalid key")
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
@@ -66,11 +66,7 @@ func (r *Broker) FetchOptionCount(option *dto.Option) (*dto.OptionWithCount, *dt
 		panic(err)
 	}
 	if !isValid {
-		erro := &dto.ErrorMessage{
-			Status:  400,
-			Message: "Invalid option selected",
-		}
-		return nil, erro
+		return nil, errors.New("400 - Invalid option selected")
 	}
 	count, err := r.conn.GetVoteCount(&bind.CallOpts{Pending: false, From: fromAddress}, option.ID)
 	if err != nil {
