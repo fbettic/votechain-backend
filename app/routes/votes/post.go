@@ -35,7 +35,9 @@ func Post(srv webserver.Server) http.HandlerFunc {
 			return
 		}
 
-		validationJson := struct{ code string }{code: validationCode}
+		validationJson := struct {
+			Code string `json:"code"`
+		}{Code: validationCode}
 
 		w.WriteHeader(http.StatusOK)
 
