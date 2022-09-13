@@ -34,10 +34,12 @@ func Post(srv webserver.Server) http.HandlerFunc {
 			json.NewEncoder(w).Encode(errorHandler.GetErrorDto(err))
 			return
 		}
+		
+		validationJson = { "code" : validationCode }
 
 		w.WriteHeader(http.StatusOK)
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(validationCode)
+		json.NewEncoder(w).Encode(validationJson)
 	}
 }
