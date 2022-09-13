@@ -27,15 +27,15 @@ func Post(srv webserver.Server) http.HandlerFunc {
 
 		json.NewDecoder(r.Body).Decode(&vote)
 		vote.AccessToken = token
-		
+
 		validationCode, err := srv.RegisterVote(vote)
 		if err != nil {
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(errorHandler.GetErrorDto(err))
 			return
 		}
-		
-		validationJson = { "code" : validationCode }
+
+		validationJson := struct{ code string }{code: validationCode}
 
 		w.WriteHeader(http.StatusOK)
 
