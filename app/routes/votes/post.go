@@ -18,11 +18,12 @@ func Post(srv webserver.Server) http.HandlerFunc {
 		middleware.EnableCors(&w)
 		var vote dto.Vote
 		token := strings.Split(r.Header["Authorization"][0], " ")[1]
+		w.Header().Set("Content-Type", "application/json")
 
 		if !verification.ValidToken(token) {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(errorHandler.GetErrorDto(errors.New("401 - Invalid login token")))
+			err := errorHandler.GetErrorDto(errors.New("401 - Invalid login token"))
+			w.WriteHeader(err.Status)
+			json.NewEncoder(w).Encode(err)
 			return
 		}
 
@@ -31,9 +32,9 @@ func Post(srv webserver.Server) http.HandlerFunc {
 
 		validationCode, err := srv.RegisterVote(vote)
 		if err != nil {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(errorHandler.GetErrorDto(err))
+			errDto := errorHandler.GetErrorDto(err)
+			w.WriteHeader(errDto.Status)
+			json.NewEncoder(w).Encode(errDto)
 			return
 		}
 
@@ -42,8 +43,6 @@ func Post(srv webserver.Server) http.HandlerFunc {
 		}{Code: validationCode}
 
 		w.WriteHeader(http.StatusOK)
-
-		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(validationJson)
 	}
 }

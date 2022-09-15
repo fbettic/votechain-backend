@@ -18,14 +18,15 @@ func Get(srv webserver.Server) http.HandlerFunc {
 		middleware.EnableCors(&w)
 		token := strings.Split(r.Header["Authorization"][0], " ")[1]
 		fmt.Println(token)
+		w.Header().Set("Content-Type", "application/json")
 
 		if !verification.ValidToken(token) {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(errorHandler.GetErrorDto(errors.New("401 - Invalid login token")))
+			err := errorHandler.GetErrorDto(errors.New("401 - Invalid login token"))
+			w.WriteHeader(err.Status)
+			json.NewEncoder(w).Encode(err)
 			return
 		}
 		options, _ := srv.FetchOptions()
-		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(options)
 	}
 }

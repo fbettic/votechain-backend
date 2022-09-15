@@ -18,8 +18,9 @@ func Post(srv webserver.Server) http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		if transaction == nil {
+			err := &dto.ErrorMessage{Status: http.StatusUnauthorized, Message: "Cuit y/o contraseña incorrectos"}
 			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(&dto.ErrorMessage{Status: http.StatusUnauthorized, Message: "Cuit y/o contraseña incorrectos"})
+			json.NewEncoder(w).Encode(err)
 		}else{
 			t:=*transaction
 			t.Password=""

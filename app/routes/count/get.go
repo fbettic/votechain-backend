@@ -18,34 +18,44 @@ func Get(srv webserver.Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		middleware.EnableCors(&w)
 		token := strings.Split(r.Header["Authorization"][0], " ")[1]
+		w.Header().Set("Content-Type", "application/json")
 
 		if !verification.ValidToken(token) {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(errorHandler.GetErrorDto(errors.New("401 - Invalid login token")))
+			err := errorHandler.GetErrorDto(errors.New("401 - Invalid login token"))
+			w.WriteHeader(err.Status)
+			json.NewEncoder(w).Encode(err)
 			return
 		}
 		vars := mux.Vars(r)
 		option := new(dto.Option)
 		option = nil
-		options, _ := srv.FetchOptions()
+		options, err := srv.FetchOptions()
+		if err != nil {
+			errDto := errorHandler.GetErrorDto(err)
+			w.WriteHeader(errDto.Status)
+			json.NewEncoder(w).Encode(errDto)
+			return
+		}
 		for _, o := range options{
 			if o.ID == vars["id"]{
 				option = o
+				break
 			}
 		}
 		if option == nil{
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(errorHandler.GetErrorDto(errors.New("404 - Option not found")))
+			err := errorHandler.GetErrorDto(errors.New("404 - Option not found"))
+			w.WriteHeader(err.Status)
+			json.NewEncoder(w).Encode(err)
 			return
 		}
 		optionCounted, err := srv.FetchOptionCount(option)
 		if err != nil {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(errorHandler.GetErrorDto(err))
+			errDto := errorHandler.GetErrorDto(err)
+			w.WriteHeader(errDto.Status)
+			json.NewEncoder(w).Encode(errDto)
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(optionCounted)
 	}
 }
