@@ -21,21 +21,25 @@ func Post(srv webserver.Server) http.HandlerFunc {
 
 		if !verification.ValidToken(token) {
 			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(errorHandler.GetErrorDto(errors.New("401 - Invalid login token")))
 			return
 		}
 
 		json.NewDecoder(r.Body).Decode(&vote)
 		vote.AccessToken = token
-		
+
 		validationCode, err := srv.RegisterVote(vote)
 		if err != nil {
 			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(errorHandler.GetErrorDto(err))
 			return
 		}
 
-		validationJson = { "code" : validationCode }
+		validationJson := struct {
+			Code string `json:"code"`
+		}{Code: validationCode}
 
 		w.WriteHeader(http.StatusOK)
 

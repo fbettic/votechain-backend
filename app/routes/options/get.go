@@ -2,9 +2,10 @@ package options
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"strings"
-	"errors"
 
 	"github.com/fbettic/votechain-backend/app/middleware"
 	"github.com/fbettic/votechain-backend/app/webserver"
@@ -16,6 +17,7 @@ func Get(srv webserver.Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		middleware.EnableCors(&w)
 		token := strings.Split(r.Header["Authorization"][0], " ")[1]
+		fmt.Println(token)
 
 		if !verification.ValidToken(token) {
 			w.Header().Set("Content-Type", "application/json")

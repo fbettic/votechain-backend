@@ -95,6 +95,8 @@ func (r *Broker) RegisterVote(vote dto.Vote) (string, error) {
 
 func (r *Broker) GetVote(code string) (*dto.Option, error){
 
+	fmt.Println(code)
+
 	hash, err := verification.GetHashCode(code)
 	if err != nil {
 		return nil, err
