@@ -28,6 +28,7 @@ func (r *Broker) RegisterVote(vote dto.Vote) (string, error) {
 		return "", errors.New("401 - Invalid login token")
 	}
 
+	user.HasVoted = false;
 	hash, err := verification.CreateHash(*user)
 	if err != nil {
 		return "", err
@@ -75,6 +76,7 @@ func (r *Broker) RegisterVote(vote dto.Vote) (string, error) {
 		panic(err)
 	}
 	if hasVoted{
+		user.HasVoted = true
 		return "", errors.New("401 - User has alredy voted")
 	}
 
@@ -89,6 +91,8 @@ func (r *Broker) RegisterVote(vote dto.Vote) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	user.HasVoted = true
 
 	return validationCode, nil
 }

@@ -1,6 +1,8 @@
 package votechain
 
 import (
+	"errors"
+
 	sampledata "github.com/fbettic/votechain-backend/internal/mock-data"
 	"github.com/fbettic/votechain-backend/pkg/dto"
 )
@@ -16,5 +18,5 @@ func (r *Broker) Login(userLogin dto.Login) (*dto.User, error) {
 		}
 	}
 
-	return nil, nil
+	return nil, errors.New("404 - User not found")
 }

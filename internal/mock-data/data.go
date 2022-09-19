@@ -104,17 +104,20 @@ var Users = map[string]*dto.User{
 		Cuit:        20586568548,
 		Password:    "123456",
 		AccessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTWF0aWFzIEd1dGllcnJleiIsImN1aXQiOjIwNTg2NTY4NTQ4fQ.Au1ind4DRn2izrgHQSNQKmEI3GCMTb7GwBezsckv3nA",
+		HasVoted: false,
 	},
 	"2": {
 		Name:        "Jorge G.",
 		Cuit:        18668524894,
 		Password:    "123456",
 		AccessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9yZ2UgR29uemFsZXoiLCJjdWl0IjoxODY2ODUyNDg5NH0.k4ZSsaJ7WeKZwNyTte0ukGGs59ALURVqGVPQmeKBbys",
+		HasVoted: false,
 	},
 	"3": {
 		Name:        "Jose A.",
 		Cuit:        20405049768,
 		Password:    "123456",
 		AccessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9zZSBBLiIsImN1aXQiOjIwNDA1MDQ5NzY4fQ.d7Bn5_DpbLxN2a7uVhujHQXmyYqs_qaFMMZTxxlUg2A",
+		HasVoted: false,
 	},
 }
