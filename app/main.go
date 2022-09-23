@@ -6,6 +6,7 @@ import (
 	"github.com/fbettic/votechain-backend/app/pipelines"
 	"github.com/fbettic/votechain-backend/app/webserver"
 	sampledata "github.com/fbettic/votechain-backend/internal/mock-data"
+	"github.com/fbettic/votechain-backend/internal/votechain"
 	"github.com/fbettic/votechain-backend/pkg/dto"
 )
 
@@ -22,6 +23,10 @@ func main() {
 	if *withData {
 		println("initializing the api with some options")
 		options = sampledata.Options
+		err := votechain.ReloadUsers()
+		if err != nil {
+			panic(err)
+		}
 	} else {
 		println("initializing the api without any options")
 	}

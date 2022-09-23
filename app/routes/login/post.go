@@ -20,15 +20,8 @@ func Post(srv webserver.Server) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		if err != nil {
 			errDto := errorHandler.GetErrorDto(err)
-			if errDto.Status == 404{
-				w.WriteHeader(http.StatusUnauthorized)
-				errDto.Message = "Usuario y/o contraseña incorrectos"
-				errDto.Status = http.StatusUnauthorized
-				json.NewEncoder(w).Encode(errDto)
-			}else{
-				w.WriteHeader(errDto.Status)
-				json.NewEncoder(w).Encode(errDto)
-			}
+			w.WriteHeader(errDto.Status)
+			json.NewEncoder(w).Encode(errDto)
 		}else{
 			t:=*transaction
 			t.Password=""
