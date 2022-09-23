@@ -1,33 +1,39 @@
-package votes
+package register
 
 import (
 	"encoding/json"
-
 	"net/http"
 
 	"github.com/fbettic/votechain-backend/app/middleware"
 	"github.com/fbettic/votechain-backend/app/webserver"
 	errorHandler "github.com/fbettic/votechain-backend/internal/error-handling"
-
-	"github.com/gorilla/mux"
+	"github.com/fbettic/votechain-backend/pkg/dto"
 )
 
-func Get(srv webserver.Server) http.HandlerFunc {
+func Post(srv webserver.Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		middleware.EnableCors(&w)
-		vars := mux.Vars(r)
+
+		var user dto.User
+		json.NewDecoder(r.Body).Decode(&user)
+
+		user.HasVoted = false
+
 		w.Header().Set("Content-Type", "application/json")
-		
-		code := vars["code"]
-		option, err := srv.GetVote(code)
+
+		err := srv.Register(user)
 		if err != nil {
 			errDto := errorHandler.GetErrorDto(err)
 			w.WriteHeader(errDto.Status)
 			json.NewEncoder(w).Encode(errDto)
-			return
+		}else{
+			w.WriteHeader(http.StatusOK)
+
+			result := struct {
+				Result string `json:"result"`
+			}{Result: "User registered correctly. You can login now"}
+
+			json.NewEncoder(w).Encode(result)
 		}
-
-
-		json.NewEncoder(w).Encode(option)
 	}
 }

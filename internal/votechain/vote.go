@@ -5,14 +5,13 @@ import (
 	"crypto/ecdsa"
 	"errors"
 	"fmt"
-	"log"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/crypto"
+	sampledata "github.com/fbettic/votechain-backend/internal/mock-data"
 	"github.com/fbettic/votechain-backend/internal/verification"
 	"github.com/fbettic/votechain-backend/pkg/dto"
-	sampledata "github.com/fbettic/votechain-backend/internal/mock-data"
 )
 
 func (r *Broker) RegisterVote(vote dto.Vote) (string, error) {
@@ -28,7 +27,6 @@ func (r *Broker) RegisterVote(vote dto.Vote) (string, error) {
 		return "", errors.New("401 - Invalid login token")
 	}
 
-	user.HasVoted = false;
 	hash, err := verification.CreateHash(*user)
 	if err != nil {
 		return "", err
@@ -36,24 +34,24 @@ func (r *Broker) RegisterVote(vote dto.Vote) (string, error) {
 
 	privateKey, err := crypto.HexToECDSA("8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7")
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	publicKey := privateKey.Public()
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
 	if !ok {
-		panic("Invalid key")
+		return "", errors.New("500 - Invalid member node key")
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
 	nonce, err := r.client.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
 	gasPrice, err := r.client.SuggestGasPrice(context.Background())
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
 	chainid, _ := r.client.ChainID(context.Background())
@@ -66,14 +64,14 @@ func (r *Broker) RegisterVote(vote dto.Vote) (string, error) {
 
 	isvalid, err := r.conn.IsValidOption(&bind.CallOpts{Pending: false, From: fromAddress},vote.OptionID)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	if !isvalid{
 		return "", errors.New("400 - Invalid option selected")
 	}
 	hasVoted, err := r.conn.HasVoted(&bind.CallOpts{Pending: false, From: fromAddress}, hash)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	if hasVoted{
 		user.HasVoted = true
@@ -82,7 +80,7 @@ func (r *Broker) RegisterVote(vote dto.Vote) (string, error) {
 
 	_, err = r.conn.CastVote(auth, hash, vote.OptionID)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	fmt.Println("Voto registrado correctamente")

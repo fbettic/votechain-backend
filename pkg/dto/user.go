@@ -10,5 +10,5 @@ type User struct{
 	Cuit 				int `json:"cuit"`
 	Password 		string `json:"password,omitempty"`
 	AccessToken string `json:"access_token"`
-	HasVoted	bool	`json:"has_voted"`
+	HasVoted	bool	`json:"has_voted,omitemty"`
 }

@@ -1,10 +1,11 @@
 package pipelines
 
 import (
-	"github.com/fbettic/votechain-backend/app/routes/options"
-	"github.com/fbettic/votechain-backend/app/routes/votes"
 	"github.com/fbettic/votechain-backend/app/routes/count"
 	"github.com/fbettic/votechain-backend/app/routes/login"
+	"github.com/fbettic/votechain-backend/app/routes/options"
+	"github.com/fbettic/votechain-backend/app/routes/register"
+	"github.com/fbettic/votechain-backend/app/routes/votes"
 	"github.com/fbettic/votechain-backend/app/webserver"
 	"github.com/gorilla/mux"
 )
@@ -17,4 +18,5 @@ func BuildPipeline(srv webserver.Server, r *mux.Router) {
 	r.HandleFunc("/votechainapi/count/{id}",count.Get(srv)).Methods("GET")
 	r.HandleFunc("/votechainapi/login",login.Post(srv)).Methods("POST")
 	r.HandleFunc("/votechainapi/getVote/{code}",votes.Get(srv)).Methods("GET")
+	r.HandleFunc("/votechainapi/register",register.Post(srv)).Methods("POST")
 }

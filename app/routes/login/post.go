@@ -2,7 +2,6 @@ package login
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/fbettic/votechain-backend/app/middleware"
@@ -33,7 +32,6 @@ func Post(srv webserver.Server) http.HandlerFunc {
 		}else{
 			t:=*transaction
 			t.Password=""
-			fmt.Println(t.HasVoted)
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(t)
 		}
