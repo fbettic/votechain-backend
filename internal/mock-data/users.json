@@ -1,0 +1,30 @@
+{
+	"18668524894": {
+		"name": "Jorge G.",
+		"cuit": 18668524894,
+		"password": "123456",
+		"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9yZ2UgR29uemFsZXoiLCJjdWl0IjoxODY2ODUyNDg5NH0.k4ZSsaJ7WeKZwNyTte0ukGGs59ALURVqGVPQmeKBbys",
+		"has_voted": false
+	},
+	"20339755141": {
+		"name": "Tomás Ferreyra",
+		"cuit": 20339755141,
+		"password": "Toma$641360",
+		"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdWl0IjoyMDMzOTc1NTE0MSwibmFtZSI6IlRvbcOhcyBGZXJyZXlyYSJ9.6VzaRXLAstz3bdXozw4RUA5findtVlkDc5CGhYWq-Rg",
+		"has_voted": false
+	},
+	"20405049768": {
+		"name": "Jose A.",
+		"cuit": 20405049768,
+		"password": "123456",
+		"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9zZSBBLiIsImN1aXQiOjIwNDA1MDQ5NzY4fQ.d7Bn5_DpbLxN2a7uVhujHQXmyYqs_qaFMMZTxxlUg2A",
+		"has_voted": false
+	},
+	"20586568548": {
+		"name": "Martin G.",
+		"cuit": 20586568548,
+		"password": "123456",
+		"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiTWF0aWFzIEd1dGllcnJleiIsImN1aXQiOjIwNTg2NTY4NTQ4fQ.Au1ind4DRn2izrgHQSNQKmEI3GCMTb7GwBezsckv3nA",
+		"has_voted": false
+	}
+}
