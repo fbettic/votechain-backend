@@ -50,6 +50,11 @@ func (r *Broker) Register(newUser dto.User) error {
 
 	users[newUser.Cuit] = &newUser
 
+	err = ReloadUsers()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -84,7 +89,7 @@ func ReloadUsers() (error){
 		delete(sUsers, user.Cuit)
 	}
 
-	data, err := json.Marshal(&usersMap)
+	data, err := json.MarshalIndent(&usersMap, "", "\t")
 	if err != nil {
 		return errors.New("500 - Fallo al formatear datos de base de datos: "+err.Error())
 	}

@@ -48,7 +48,7 @@ func CreateVerificationCode(hash string) (string, error) {
 			verificationMap[code] = hash
 			isValidCode = true
 
-			data, err := json.Marshal(&verificationMap)
+			data, err := json.MarshalIndent(&verificationMap, "", "\t")
 			if err != nil {
 				return "", errors.New("500 - Fallo al formatear datos de base de datos: "+err.Error())
 			}
