@@ -1,0 +1,49 @@
+* Los strings de las opciones que se guardan en el contrato deberían ser hashs generados a partir de toda la información 
+de dicha opción (quizás sin incluir la imagen), de esta forma se previene la alteración de la información de
+los candidatos u opciones en la base de datos
+
+* Probar la idea de, con lo anterior implementado, poder guardar las opciones de múltiple choice en el contrato
+
+* Generar endpoint para deployar nuevo contrato
+
+* Generar dtos para encuestas y votaciones, para poder hacer endpoint para crear nuevo proceso electoral
+
+* Endpoints para listar, seleccionar, cerrar o cambiar entre votaciones/encuestas
+
+---------------------------------
+
+Cambios en ferreyra-back
+
+* Endpoint para registrar usuarios
+* Usar cuit de usuario para mapeo de datos. Facilita búsqueda y elimina bucles
+* Mejora de seguridad: En vez de registrar el id de la opción elegida en el voto, se registra
+    un hash generado a partir de todos los datos de la opción, menos la imagen, de modo que sean los datos
+    de la opción inalterable o, más bien, salte un error si se modifica (votos quedan inválidos). MEJORAR
+* Generamos JSON con usuarios y mantenemos actualizados los usuarios cargados en memoria con respecto a dicho JSON.
+    Ésto permite consistencia al registrar nuevos usuarios y salir y volver a entrar al sistema
+* Agregados los dto Question y Answer, avanzando hacia la meta de que el sistema sirva para votaciones y encuestas.
+
+
+Funciones agregadas:
+- votechain/user.go -> Register
+- votechain/user.go -> ReloadUsers
+- votechain/option.go -> RemoveImage
+- verification/hash.go -> GenerateJWT
+- routes/register/post.go -> Post
+
+
+-------------------------------------------------
+-------------------------------------------------
+-------------------------------------------------
+IMPORTANTE
+
+Modificaciones hechas al deploy_contract de votechain-contracts-api para que controle si hay argumentos pasados.
+Ésto es para que se pueda llamar como comando externo a deploy_contract.go y pasarle como argumentos
+los hashes de las opciones para deployar un nuevo contrato
+
+Los cambios no se han guardado en el repositorio git (ni local ni remoto).
+
+Hay que corregir las opciones mock-data harcodeadas y actualizar los ids por los hashes de las opciones, si no no funcionará nada.
+-------------------------------------------------
+-------------------------------------------------
+-------------------------------------------------

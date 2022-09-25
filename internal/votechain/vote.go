@@ -62,7 +62,16 @@ func (r *Broker) RegisterVote(vote dto.Vote) (string, error) {
 	auth.GasLimit = uint64(300000) // in units
 	auth.GasPrice = gasPrice
 
-	isvalid, err := r.conn.IsValidOption(&bind.CallOpts{Pending: false, From: fromAddress},vote.OptionID)
+	option := r.options[vote.OptionID]
+	if option == nil {
+		return "", errors.New("404 - Option not found")
+	}
+	optionHash, err := verification.CreateHash(*RemoveImage(option))
+	if err != nil {
+		return "", err
+	}
+
+	isvalid, err := r.conn.IsValidOption(&bind.CallOpts{Pending: false, From: fromAddress},optionHash)
 	if err != nil {
 		return "", err
 	}
@@ -78,7 +87,7 @@ func (r *Broker) RegisterVote(vote dto.Vote) (string, error) {
 		return "", errors.New("401 - User has alredy voted")
 	}
 
-	_, err = r.conn.CastVote(auth, hash, vote.OptionID)
+	_, err = r.conn.CastVote(auth, hash, optionHash)
 	if err != nil {
 		return "", err
 	}
@@ -132,7 +141,11 @@ func (r *Broker) GetVote(code string) (*dto.Option, error){
 
 	option := new(dto.Option)
 	for _, opt := range r.options{
-		if opt.ID == optionVoted{
+		hash, err := verification.CreateHash(*RemoveImage(opt))
+		if err != nil {
+			return nil, err
+		}
+		if hash == optionVoted{
 			option = opt
 		}
 	}

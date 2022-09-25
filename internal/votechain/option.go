@@ -82,3 +82,10 @@ func (r *Broker) FetchOptionCount(option *dto.Option) (*dto.OptionWithCount, err
 
 	return optionWithCount, nil
 }
+
+func RemoveImage(option *dto.Option) (*dto.Option) {
+	opt := new(dto.Option)
+	*opt = *option
+	opt.Image = ""
+	return opt
+}

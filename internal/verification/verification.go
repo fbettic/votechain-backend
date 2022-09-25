@@ -111,12 +111,10 @@ func GetHashCode(verificationCode string) (string, error) {
 }
 
 func ValidToken(token string) bool{
-	validToken := false
 	for _,user := range sampledata.Users{
 		if user.AccessToken == token{
-			validToken = true
-			break
+			return true
 		}
 	}
-	return validToken
+	return false
 }

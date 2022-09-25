@@ -6,12 +6,12 @@ import (
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/fbettic/votechain-backend/pkg/dto"
+	//"github.com/fbettic/votechain-backend/pkg/dto"
 	jwt "github.com/golang-jwt/jwt/v4"
 )
 
-func CreateHash(user dto.User) (string, error) {
-	data, err := json.Marshal(user)
+func CreateHash(info any) (string, error) {
+	data, err := json.Marshal(info)
 
 	
 	if err != nil {
